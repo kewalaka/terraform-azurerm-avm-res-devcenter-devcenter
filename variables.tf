@@ -1,3 +1,19 @@
+variable "timeouts" {
+  type = object({
+    create = optional(string)
+    delete = optional(string)
+    read   = optional(string)
+    update = optional(string)
+  })
+  default     = null
+  description = <<-EOT
+ - `create` - (Defaults to 30 minutes) Used when creating this Dev Center.
+ - `delete` - (Defaults to 30 minutes) Used when deleting this Dev Center.
+ - `read` - (Defaults to 5 minutes) Used when retrieving this Dev Center.
+ - `update` - (Defaults to 30 minutes) Used when updating this Dev Center.
+EOT
+}
+
 variable "enable_telemetry" {
   type        = bool
   default     = true
@@ -22,13 +38,15 @@ variable "location" {
 
 variable "name" {
   type        = string
-  description = "The name of the this resource."
+  description = "The name of the Dev Center resource."
   validation {
-    condition     = can(regex("TODO determine REGEX", var.name))
-    error_message = "The name must be TODO."
-    # TODO remove the example below once complete:
-    #condition     = can(regex("^[a-z0-9]{5,50}$", var.name))
-    #error_message = "The name must be between 5 and 50 characters long and can only contain lowercase letters and numbers."
+    condition     = length(var.name) >= 3 && length(var.name) <= 26
+    error_message = "Dev Center name must be between 3 and 26 characters long."
+  }
+
+  validation {
+    condition     = can(regex("^[^\\/\"\\[\\]:|<>+=;,?*@&\\s_\\-].*[^.]$", var.name))
+    error_message = "Dev Center name cannot contain special characters, whitespace, begin with '_' or '-', or end with '.'."
   }
 }
 
@@ -115,6 +133,7 @@ variable "managed_identities" {
   default     = {}
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "private_endpoints" {
   type = map(object({
     name = optional(string, null)
