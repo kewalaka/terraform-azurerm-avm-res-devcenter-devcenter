@@ -10,12 +10,13 @@ resource "azurerm_dev_center" "this" {
   tags                = var.tags
 
   dynamic "identity" {
-    for_each = var.managed_identities == null ? [] : [var.managed_identities]
+    for_each = (var.managed_identities.system_assigned || length(var.managed_identities.user_assigned_resource_ids) > 0) ? { this = var.managed_identities } : {}
     content {
-      type         = identity.value.type
-      identity_ids = identity.value.identity_ids
+      type         = identity.value.system_assigned && length(identity.value.user_assigned_resource_ids) > 0 ? "SystemAssigned, UserAssigned" : length(identity.value.user_assigned_resource_ids) > 0 ? "UserAssigned" : "SystemAssigned"
+      identity_ids = identity.value.user_assigned_resource_ids
     }
   }
+
   dynamic "timeouts" {
     for_each = var.timeouts == null ? [] : [var.timeouts]
     content {
