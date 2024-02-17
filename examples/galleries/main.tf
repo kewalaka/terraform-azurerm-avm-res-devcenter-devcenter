@@ -52,7 +52,7 @@ module "dev_center" {
   }
 
   galleries = {
-    "${module.naming.shared_image_gallery.name_unique}" = {
+    example = {
       shared_gallery_id = azurerm_shared_image_gallery.this.id
     }
   }
