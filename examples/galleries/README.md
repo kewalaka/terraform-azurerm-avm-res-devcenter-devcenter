@@ -30,9 +30,15 @@ resource "azurerm_resource_group" "this" {
   location = "australiaeast"
 }
 
-# this is a pre-requisite for adding a gallery to a dev center
+# these resources are pre-requisites for adding a gallery to a dev center
 resource "azurerm_shared_image_gallery" "this" {
   name                = module.naming.shared_image_gallery.name_unique
+  location            = azurerm_resource_group.this.location
+  resource_group_name = azurerm_resource_group.this.name
+}
+
+resource "azurerm_user_assigned_identity" "this" {
+  name                = module.naming.user_assigned_identity.name_unique
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
 }
@@ -44,6 +50,11 @@ module "dev_center" {
   enable_telemetry    = var.enable_telemetry # see variables.tf
   name                = module.naming.dev_test_lab.name_unique
   resource_group_name = azurerm_resource_group.this.name
+
+  # a managed identity is required to be able to add a gallery to a dev center
+  managed_identities = {
+    user_assigned_resource_ids = [azurerm_user_assigned_identity.this.id]
+  }
 
   galleries = {
     my-dev-center-gallery = {
@@ -74,6 +85,7 @@ The following resources are used by this module:
 
 - [azurerm_resource_group.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) (resource)
 - [azurerm_shared_image_gallery.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/shared_image_gallery) (resource)
+- [azurerm_user_assigned_identity.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity) (resource)
 
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs
