@@ -27,6 +27,7 @@ The following providers are used by this module:
 The following resources are used by this module:
 
 - [azurerm_dev_center.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dev_center) (resource)
+- [azurerm_dev_center_gallery.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dev_center_gallery) (resource)
 - [azurerm_management_lock.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/management_lock) (resource)
 - [azurerm_resource_group_template_deployment.telemetry](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group_template_deployment) (resource)
 - [azurerm_role_assignment.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
@@ -114,6 +115,31 @@ If it is set to false, then no telemetry will be collected.
 Type: `bool`
 
 Default: `true`
+
+### <a name="input_galleries"></a> [galleries](#input\_galleries)
+
+Description:  - `shared_gallery_id` - (Required) The ID of the Shared Gallery which should be connected to the Dev Center Gallery. Changing this forces a new Dev Center Gallery to be created.
+
+---
+`timeouts` block supports the following:
+- `create` - (Defaults to 30 minutes) Used when creating this Dev Center Gallery.
+- `delete` - (Defaults to 30 minutes) Used when deleting this Dev Center Gallery.
+- `read` - (Defaults to 5 minutes) Used when retrieving this Dev Center Gallery.
+
+Type:
+
+```hcl
+map(object({
+    shared_gallery_id = string
+    timeouts = optional(object({
+      create = optional(string)
+      delete = optional(string)
+      read   = optional(string)
+    }))
+  }))
+```
+
+Default: `{}`
 
 ### <a name="input_location"></a> [location](#input\_location)
 
