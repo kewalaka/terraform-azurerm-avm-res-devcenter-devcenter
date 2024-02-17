@@ -10,6 +10,7 @@ terraform {
 
 provider "azurerm" {
   features {}
+  skip_provider_registration = true
 }
 
 # This ensures we have unique CAF compliant names for our resources.

@@ -10,6 +10,7 @@ terraform {
 
 provider "azurerm" {
   features {}
+  skip_provider_registration = true
 }
 
 # This ensures we have unique CAF compliant names for our resources.
@@ -51,7 +52,7 @@ module "dev_center" {
   }
 
   galleries = {
-    my-dev-center-gallery = {
+    "${module.naming.shared_image_gallery.name_unique}" = {
       shared_gallery_id = azurerm_shared_image_gallery.this.id
     }
   }

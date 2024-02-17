@@ -14,5 +14,12 @@ resource "azurerm_dev_center_gallery" "this" {
       read   = timeouts.value.read
     }
   }
+
+  lifecycle {
+    precondition {
+      condition     = length(var.galleries) == 0 || (length(var.managed_identities.user_assigned_resource_ids) > 0 || var.managed_identities.system_assigned)
+      error_message = "If specifying any gallery resources, the dev center must be configured with either a user assigned or system assigned managed identity."
+    }
+  }
 }
 
