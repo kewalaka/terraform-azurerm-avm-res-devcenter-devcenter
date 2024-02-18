@@ -1,7 +1,7 @@
 <!-- BEGIN_TF_DOCS -->
 # Default example
 
-This deploys the module in its simplest form.
+This deploys the dev center module with a gallery.
 
 ```hcl
 terraform {
@@ -31,17 +31,37 @@ resource "azurerm_resource_group" "this" {
   location = "australiaeast"
 }
 
-# This is the module call
-# Do not specify location here due to the randomization above.
-# Leaving location as `null` will cause the module to use the resource group location
-# with a data source.
+# these resources are pre-requisites for adding a gallery to a dev center
+resource "azurerm_shared_image_gallery" "this" {
+  name                = module.naming.shared_image_gallery.name_unique
+  location            = azurerm_resource_group.this.location
+  resource_group_name = azurerm_resource_group.this.name
+}
+
+resource "azurerm_user_assigned_identity" "this" {
+  name                = module.naming.user_assigned_identity.name_unique
+  location            = azurerm_resource_group.this.location
+  resource_group_name = azurerm_resource_group.this.name
+}
+
 module "dev_center" {
   source = "../../"
-  # source             = "Azure/avm-<res/ptn>-<name>/azurerm"
+  # source             = "Azure/avm-res-devcenter-devcenter/azurerm"
   # ...
   enable_telemetry    = var.enable_telemetry # see variables.tf
   name                = module.naming.dev_test_lab.name_unique
   resource_group_name = azurerm_resource_group.this.name
+
+  # a managed identity is required to be able to add a gallery to a dev center
+  managed_identities = {
+    user_assigned_resource_ids = [azurerm_user_assigned_identity.this.id]
+  }
+
+  galleries = {
+    example = {
+      shared_gallery_id = azurerm_shared_image_gallery.this.id
+    }
+  }
 }
 ```
 
@@ -65,6 +85,8 @@ The following providers are used by this module:
 The following resources are used by this module:
 
 - [azurerm_resource_group.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) (resource)
+- [azurerm_shared_image_gallery.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/shared_image_gallery) (resource)
+- [azurerm_user_assigned_identity.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity) (resource)
 
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs
